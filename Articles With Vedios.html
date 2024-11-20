@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Articles Chart</title>
+</head>
+<body>
+<!-- Styles -->
+<style>
+#chartdiv {
+  width: 100%;
+  height: 500px;
+}
+</style>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+<!-- Chart code -->
+<script>
+am5.ready(function() {
+
+    // Create root element
+    var root = am5.Root.new("chartdiv");
+
+    // Set themes
+    root.setThemes([am5themes_Animated.new(root)]);
+
+    // Create chart
+    var chart = root.container.children.push(am5xy.XYChart.new(root, {
+        panX: true,
+        panY: true,
+        wheelX: "panX",
+        wheelY: "zoomX",
+        pinchZoomX: true,
+        paddingLeft:0,
+        layout: root.verticalLayout
+    }));
+
+    chart.set("colors", am5.ColorSet.new(root, {
+        colors: [
+            am5.color(0x73556E),
+            am5.color(0x9FA1A6),
+            am5.color(0xF2AA6B),
+            am5.color(0xF28F6B),
+            am5.color(0xA95A52),
+            am5.color(0xE35B5D),
+            am5.color(0xFFA446)
+        ]
+    }));
+
+    // Create axes
+    var xRenderer = am5xy.AxisRendererX.new(root, {
+        minGridDistance: 50,
+        minorGridEnabled: true
+    });
+
+    xRenderer.grid.template.setAll({ location: 1 });
+
+    var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+        maxDeviation: 0.3,
+        categoryField: "title",
+        renderer: xRenderer,
+        tooltip: am5.Tooltip.new(root, {})
+    }));
+
+    var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        maxDeviation: 0.3,
+        min: 0,
+        renderer: am5xy.AxisRendererY.new(root, {
+            strokeOpacity: 0.1
+        })
+    }));
+
+    // Create series
+    var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+        name: "Series 1",
+        xAxis: xAxis,
+        yAxis: yAxis,
+        valueYField: "count", // We'll set this to 1 for every title (since you are just listing articles)
+        categoryXField: "title",
+        tooltip: am5.Tooltip.new(root, {
+            labelText: "{categoryX}: {valueY}"
+        })
+    }));
+
+    series.columns.template.setAll({
+        tooltipY: 0,
+        tooltipText: "{categoryX}",
+        shadowOpacity: 0.1,
+        shadowOffsetX: 2,
+        shadowOffsetY: 2,
+        shadowBlur: 1,
+        strokeWidth: 2,
+        stroke: am5.color(0xffffff),
+        shadowColor: am5.color(0x000000),
+        cornerRadiusTL: 50,
+        cornerRadiusTR: 50
+    });
+
+    series.columns.template.states.create("hover", {
+        shadowOpacity: 1,
+        shadowBlur: 10,
+        cornerRadiusTL: 10,
+        cornerRadiusTR: 10
+    });
+
+    // Fetch data from the API and populate the chart
+    fetch('http://127.0.0.1:5000/articles_with_video')
+      .then(response => response.json())
+      .then(data => {
+        // Transform API data to match the format required by the chart
+        const chartData = data.map(title => ({ title: title, count: 1 }));
+
+        // Set the data for the xAxis and series
+        xAxis.data.setAll(chartData);
+        series.data.setAll(chartData);
+      })
+      .catch(error => console.error('Error:', error));
+
+    // Make stuff animate on load
+    series.appear(1000);
+    chart.appear(1000, 100);
+
+}); // end am5.ready()
+</script>
+<script>
+am5.ready(function() {
+
+    // Create root element
+    var root = am5.Root.new("chartdiv");
+
+    // Set themes
+    root.setThemes([am5themes_Animated.new(root)]);
+
+    // Create chart
+    var chart = root.container.children.push(am5xy.XYChart.new(root, {
+        panX: true,
+        panY: true,
+        wheelX: "panX",
+        wheelY: "zoomX",
+        pinchZoomX: true,
+        paddingLeft:0,
+        layout: root.verticalLayout
+    }));
+
+    chart.set("colors", am5.ColorSet.new(root, {
+        colors: [
+            am5.color(0x73556E),
+            am5.color(0x9FA1A6),
+            am5.color(0xF2AA6B),
+            am5.color(0xF28F6B),
+            am5.color(0xA95A52),
+            am5.color(0xE35B5D),
+            am5.color(0xFFA446)
+        ]
+    }));
+
+    // Create axes
+    var xRenderer = am5xy.AxisRendererX.new(root, {
+        minGridDistance: 50,
+        minorGridEnabled: true
+    });
+
+    xRenderer.grid.template.setAll({ location: 1 });
+
+    var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+        maxDeviation: 0.3,
+        categoryField: "title",
+        renderer: xRenderer,
+        tooltip: am5.Tooltip.new(root, {})
+    }));
+
+    var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        maxDeviation: 0.3,
+        min: 0,
+        renderer: am5xy.AxisRendererY.new(root, {
+            strokeOpacity: 0.1
+        })
+    }));
+
+    // Create series
+    var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+        name: "Series 1",
+        xAxis: xAxis,
+        yAxis: yAxis,
+        valueYField: "count", // We'll set this to count occurrences of each title
+        categoryXField: "title",
+        tooltip: am5.Tooltip.new(root, {
+            labelText: "{categoryX}: {valueY}"
+        })
+    }));
+
+    series.columns.template.setAll({
+        tooltipY: 0,
+        tooltipText: "{categoryX}: {valueY}",
+        shadowOpacity: 0.1,
+        shadowOffsetX: 2,
+        shadowOffsetY: 2,
+        shadowBlur: 1,
+        strokeWidth: 2,
+        stroke: am5.color(0xffffff),
+        shadowColor: am5.color(0x000000),
+        cornerRadiusTL: 50,
+        cornerRadiusTR: 50
+    });
+
+    series.columns.template.states.create("hover", {
+        shadowOpacity: 1,
+        shadowBlur: 10,
+        cornerRadiusTL: 10,
+        cornerRadiusTR: 10
+    });
+
+    // Fetch data from the API and populate the chart
+    fetch('http://127.0.0.1:5000/articles_with_video')
+      .then(response => response.json())
+      .then(data => {
+        // Create a map to count occurrences of each title
+        const titleCounts = data.reduce((acc, title) => {
+          // Ensure that titles are counted even if they are repeated
+          acc[title] = (acc[title] || 0) + 1;
+          return acc;
+        }, {});
+
+        // Transform the map into an array of objects for the chart
+        const chartData = Object.keys(titleCounts).map(title => ({
+          title: title,
+          count: titleCounts[title]
+        }));
+
+        // Set the data for the xAxis and series
+        xAxis.data.setAll(chartData);
+        series.data.setAll(chartData);
+      })
+      .catch(error => console.error('Error:', error));
+
+    // Make stuff animate on load
+    series.appear(1000);
+    chart.appear(1000, 100);
+
+}); // end am5.ready()
+</script>
+
+<!-- HTML -->
+<div id="chartdiv"></div>
+</body>
+</html>
